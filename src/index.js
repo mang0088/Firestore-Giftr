@@ -28,7 +28,6 @@ const app = initializeApp(firebaseConfig);
 // get a reference to the database
 const db = getFirestore(app);
 const people = [];
-
 const months = [
   'January',
   'February',
@@ -68,8 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnSaveIdea').addEventListener('click', saveIdea);
 
   document
-    .querySelector('.idea-list')
+    .querySelector('.person-list')
     .addEventListener('click', handleSelectPerson);
+
+  loadInitialData();
 
   // document
   //   .querySelector('.person-list')
@@ -78,8 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // document
   //   .querySelector('.deleteBtn')
   //   .addEventListener('click', deleteSelected);
-
-  loadInitialData();
 
   //TODO: add the `onSnapshot` listener
 });
@@ -90,7 +89,6 @@ function loadInitialData() {
   //select the first person on the list
   //load the gift-ideas collection and display
   getIdeas();
-  handleClick();
 }
 
 async function getPeople() {
@@ -124,8 +122,8 @@ function buildPeople(people) {
       return `<li data-id="${person.id}" class="person">
               <p class="name">${person.name}</p>
               <p class="dob">${dob}</p>
-              <button class="editBtn">Edit</button>
-              <button class="deleteBtn">Delete</button>
+              <button class="edit">Edit</button>
+              <button class="delete">Delete</button>
             </li>`;
     })
     .join('');
@@ -166,12 +164,12 @@ function handleSelectPerson(ev) {
     //user clicked inside li
     selectedPersonId = id;
     //did they click the li content OR an edit button OR a delete button?
-    if (ev.target.classList.contains('editBtn')) {
+    if (ev.target.classList.contains('edit')) {
       editPerson(id, querySnapshot.data);
       //EDIT the doc using the id to get a docRef
       //show the dialog form to EDIT the doc (same form as ADD)
       //Load all the Person document details into the form from docRef
-    } else if (ev.target.classList.contains('deleteBtn')) {
+    } else if (ev.target.classList.contains('delete')) {
       deletePerson(id, querySnapshot.data().name);
       //DELETE the doc using the id to get a docRef
       //do a confirmation before deleting
@@ -234,29 +232,15 @@ function buildIdeas(ideas) {
                 >
                 <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
-                <button class="editBtn">Edit</button>
-                <button class="deleteBtn">Delete</button>
+                <button class="edit">Edit</button>
+                <button class="delete">Delete</button>
               </li>`;
       })
       .join('');
-
-    ideas.forEach((idea) => {
-      let ideaChecked = document.getElementById(`chk-${idea.id}`);
-      if (
-        idea.bought
-          ? (ideaChecked.checked = true)
-          : (ideaChecked.checked = false)
-      );
-      ideaChecked.addEventListener('change', giftBought);
-    });
   } else {
     ul.innerHTML =
       '<li class="idea"><p></p><p>No Gift Ideas for selected person.</p></li>'; //clear in case there are no records to shows
   }
-
-  // let selectedIdeas = idea[0].id;
-  // console.log(selected);
-  // return selectedIdeas;
   //add listener for 'change' or 'input' event on EVERY checkbox '.idea [type="checkbox"]'
   // which will call a function to update the `bought` value for the document
 }
@@ -354,13 +338,13 @@ function handleClick(ev) {
   }
 }
 
-async function editPerson(id, person) {
-  showOverlay(id, true, person);
-}
+// async function editPerson(id, person) {
+//   showOverlay(id, true, person);
+// }
 
-async function deletePerson(id, name) {
-  hideOverlay(id, true, name);
-}
+// async function deletePerson(id, name) {
+//   hideOverlay(id, true, name);
+// }
 
 function hideOverlay(ev) {
   ev.preventDefault();

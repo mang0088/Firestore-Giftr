@@ -8,5 +8,6 @@ module.exports = {
     filename: 'bundle.js',
     //name of the compiled JS file inside dist - to be loaded by index.html
   },
+
   watch: true, //hot reloading when changes are saved inside src folder
 };
