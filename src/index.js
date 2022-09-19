@@ -11,6 +11,7 @@ import {
   addDoc,
   setDoc,
   orderBy,
+  deleteDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -43,8 +44,6 @@ const months = [
   'December',
 ];
 let selectedPersonId = null;
-// let updateElemId = null;
-// let deletePersonId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   //set up the dom events
@@ -71,14 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     .addEventListener('click', handleSelectPerson);
 
   loadInitialData();
-
-  // document
-  //   .querySelector('.person-list')
-  //   .addEventListener('click', handleSelectIdea);
-
-  // document
-  //   .querySelector('.deleteBtn')
-  //   .addEventListener('click', deleteSelected);
 
   //TODO: add the `onSnapshot` listener
 });
@@ -140,37 +131,69 @@ function showPerson(person) {
   ul.innerHTML += `<li data-id="${person.id}" class="person">
     <p class="name">${person.name}</p>
     <p class="dob">${dob}</p>
-    <button class="editBtn">Edit</button>
-    <button class="deleteBtn">Delete</button>
+    <button class="edit">Edit</button>
+    <button class="delete">Delete</button>
   </li>`;
   //add to people array
   people.push(person);
 }
 
-function handleSelectPerson(ev) {
+async function handleSelectPerson(ev) {
   //ev.target; - could be the button OR anything in the ul.
   const li = ev.target.closest('.person'); //see if there is a parent <li class="person">
   // console.log(`${li.getAttribute('data-id')} was clicked`);
   const id = li ? li.getAttribute('data-id') : null; // if li exists then the user clicked inside an <li>
 
-  // const personRef = doc(collection(db, 'people'), id);
-  // const docs = query(
-  //   collection(db, 'gift-ideas'),
-  //   where('person-id', '==', personRef)
-  // );
-  // const querySnapshot = await getDocs(docs);
+  const collectionRef = collection(db, 'people');
+  const docRef = doc(collectionRef, id);
+  const docSnap = await getDoc(docRef);
+
+  //then run a query where the `person-id` property matches the reference for the person
+  const dldocs = query(
+    collection(db, 'gift-ideas'),
+    where('person-id', '==', docRef)
+  );
+  const dlquerySnapshot = await getDocs(dldocs);
+
+  //select the first person from the list of people
+  selectedPersonId = buildPeople(people);
 
   if (id) {
     //user clicked inside li
     selectedPersonId = id;
     //did they click the li content OR an edit button OR a delete button?
     if (ev.target.classList.contains('edit')) {
-      editPerson(id, querySnapshot.data);
+      console.log(docSnap.data());
+
       //EDIT the doc using the id to get a docRef
       //show the dialog form to EDIT the doc (same form as ADD)
       //Load all the Person document details into the form from docRef
     } else if (ev.target.classList.contains('delete')) {
-      deletePerson(id, querySnapshot.data().name);
+      // deletePerson(id, docSnap.data().name);
+
+      let confirmDelete = window.confirm(
+        `Delete ${docSnap.data().name} person and it's Gifts?`
+      );
+      if (confirmDelete) {
+        //delete steps
+        await deleteDoc(doc(db, 'people', id));
+
+        dlquerySnapshot.forEach((dldoc) => {
+          //every `doc` object has a `id` property that holds the `_id` value from Firestore.
+          //every `doc` object has a doc() method that gives you a JS object with all the properties
+
+          let dlid = dldoc.id;
+          deleteDoc(doc(db, 'gift-ideas', dlid));
+          console.log(`${docSnap.data().name} has id: ${dlid}`);
+        });
+        alert(`${docSnap.data().name} data removed successfully`);
+
+        location.reload();
+      } else if (ev.target.classList.contains('edit')) {
+        console.log('delete idea');
+      } else {
+        console.log('Cancel');
+      }
       //DELETE the doc using the id to get a docRef
       //do a confirmation before deleting
     } else {
@@ -204,6 +227,7 @@ async function getIdeas(id) {
     //every `doc` object has a doc() method that gives you a JS object with all the properties
     const data = doc.data();
     const id = doc.id;
+    // console.log(`idea ${id}`);
     //person_id is a reference type
     //we want the actual id string in our object use id to get the _id
     // console.log(data['person-id']);
@@ -232,8 +256,8 @@ function buildIdeas(ideas) {
                 >
                 <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
-                <button class="edit">Edit</button>
-                <button class="delete">Delete</button>
+                <button class="dlgedit">Edit</button>
+                <button class="dlgIdea">Delete</button>
               </li>`;
       })
       .join('');
@@ -313,39 +337,6 @@ async function saveIdea() {
   //TODO: update this function to work as an UPDATE method too
 }
 
-function handleClick(ev) {
-  //ev.target;
-  const li = ev.target.closest('.person'); //see if there is a parent <li class="thing">
-  const id = li ? li.id : null; // if li exists then the user clicked inside an <li>
-
-  if (id) {
-    //user clicked inside li
-    //did they click the li content OR an edit button OR a delete button?
-    if (ev.target.classList.has('edit')) {
-      //EDIT the doc using the id to get a docRef
-      //show the dialog form to EDIT the doc (same form as ADD)
-      //Load all the Thing document details into the form from docRef
-    } else if (ev.target.classList.has('delete')) {
-      //DELETE the doc using the id to get a docRef
-      //do a confirmation before deleting
-    } else {
-      //content inside the <li> but NOT a <button> was clicked
-      //Are you just selecting a Thing for a purpose?
-    }
-  } else {
-    //clicked a button not inside <li class="thing">
-    //Show the dialog form to ADD the doc (same form as EDIT)
-  }
-}
-
-// async function editPerson(id, person) {
-//   showOverlay(id, true, person);
-// }
-
-// async function deletePerson(id, name) {
-//   hideOverlay(id, true, name);
-// }
-
 function hideOverlay(ev) {
   ev.preventDefault();
   if (
@@ -360,6 +351,7 @@ function hideOverlay(ev) {
     .querySelectorAll('.overlay dialog')
     .forEach((dialog) => dialog.classList.remove('active'));
 }
+
 function showOverlay(ev) {
   ev.preventDefault();
   document.querySelector('.overlay').classList.add('active');
