@@ -10,8 +10,8 @@ import {
   getDoc,
   addDoc,
   setDoc,
-  orderBy,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -44,6 +44,8 @@ const months = [
   'December',
 ];
 let selectedPersonId = null;
+let saveBtn = document.getElementById('btnSavePerson');
+saveBtn.classList.add('addPerson');
 
 document.addEventListener('DOMContentLoaded', () => {
   //set up the dom events
@@ -68,6 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('.person-list')
     .addEventListener('click', handleSelectPerson);
+
+  document
+    .querySelector('.idea-list')
+    .addEventListener('click', handleSelectGift);
 
   loadInitialData();
 
@@ -163,11 +169,32 @@ async function handleSelectPerson(ev) {
     selectedPersonId = id;
     //did they click the li content OR an edit button OR a delete button?
     if (ev.target.classList.contains('edit')) {
-      console.log(docSnap.data());
+      saveBtn.className = 'editPerson';
 
-      //EDIT the doc using the id to get a docRef
-      //show the dialog form to EDIT the doc (same form as ADD)
-      //Load all the Person document details into the form from docRef
+      document.querySelector('.overlay').classList.add('active');
+      document.getElementById('dlgPerson').classList.add('active');
+
+      if (saveBtn.classList.contains('editPerson')) {
+        document.querySelector(`#dlgPerson > h2`).innerHTML = `Edit ${
+          docSnap.data().name
+        }`;
+        document.getElementById('name').value = docSnap.data().name;
+        document.getElementById('month').value = docSnap.data()['birth-month'];
+        document.getElementById('day').value = docSnap.data()['birth-day'];
+
+        let name = document.getElementById('name').value;
+        let month = document.getElementById('month').value;
+        let day = document.getElementById('day').value;
+
+        console.log(`${name} ${month} ${day}`);
+        const person = {
+          name,
+          'birth-month': month,
+          'birth-day': day,
+        };
+
+        await setDoc(doc(db, 'people', id), person);
+      }
     } else if (ev.target.classList.contains('delete')) {
       // deletePerson(id, docSnap.data().name);
 
@@ -204,6 +231,41 @@ async function handleSelectPerson(ev) {
       li.classList.add('selected');
       //and load all the gift idea documents for that person
       getIdeas(id);
+    }
+  } else {
+    //clicked a button not inside <li class="person">
+    //Show the dialog form to ADD the doc (same form as EDIT)
+    //showOverlay function can be called from here or with the click listener in DOMContentLoaded, not both
+  }
+}
+
+async function handleSelectGift(ev) {
+  //ev.target; - could be the button OR anything in the ul.
+  const li = ev.target.closest('.idea'); //see if there is a parent <li class="person">
+  // console.log(`${li.getAttribute('data-id')} was clicked`);
+  const id = li ? li.getAttribute('data-id') : null; // if li exists then the user clicked inside an <li>
+
+  const collectionRef = collection(db, 'gift-ideas');
+  const docRef = doc(collectionRef, id);
+  const docSnap = await getDoc(docRef);
+
+  if (id) {
+    if (ev.target.classList.contains('dlgedit')) {
+      //Edit gifts
+    } else if (ev.target.classList.contains('dlgdelete')) {
+      // deletePerson(id, docSnap.data().name);
+      console.log('in gift delete');
+      let confirmDelete = window.confirm(`Delete ${docSnap.data().idea} Gift?`);
+      if (confirmDelete) {
+        //delete steps
+        await deleteDoc(doc(db, 'gift-ideas', id));
+
+        alert(`${docSnap.data().idea} data removed successfully`);
+
+        location.reload();
+      } else {
+        console.log('Cancel');
+      }
     }
   } else {
     //clicked a button not inside <li class="person">
@@ -257,7 +319,7 @@ function buildIdeas(ideas) {
                 <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
                 <button class="dlgedit">Edit</button>
-                <button class="dlgIdea">Delete</button>
+                <button class="dlgdelete">Delete</button>
               </li>`;
       })
       .join('');
@@ -280,24 +342,28 @@ async function savePerson() {
     'birth-month': month,
     'birth-day': day,
   };
-  try {
-    const docRef = await addDoc(collection(db, 'people'), person);
-    console.log('Document written with ID: ', docRef.id);
-    //1. clear the form fields
-    document.getElementById('name').value = '';
-    document.getElementById('month').value = '';
-    document.getElementById('day').value = '';
-    //2. hide the dialog and the overlay by clicking on overlay
-    document.querySelector('.overlay').click();
-    //3. TODO: display a message to the user about success
 
-    person.id = docRef.id;
-    //4. ADD the new HTML to the <ul> using the new object
-    showPerson(person);
-  } catch (err) {
-    console.error('Error adding document: ', err);
-    //do you want to stay on the dialog?
-    //display a mesage to the user about the problem
+  if (saveBtn.classList.contains('addPerson')) {
+    try {
+      const docRef = await addDoc(collection(db, 'people'), person);
+      console.log('Document written with ID: ', docRef.id);
+      //1. clear the form fields
+      document.getElementById('name').value = '';
+      document.getElementById('month').value = '';
+      document.getElementById('day').value = '';
+      //2. hide the dialog and the overlay by clicking on overlay
+      document.querySelector('.overlay').click();
+      //3. TODO: display a message to the user about success
+
+      person.id = docRef.id;
+      //4. ADD the new HTML to the <ul> using the new object
+      showPerson(person);
+      saveBtn.classList.remove('addPerson');
+    } catch (err) {
+      console.error('Error adding document: ', err);
+      //do you want to stay on the dialog?
+      //display a mesage to the user about the problem
+    }
   }
   //TODO: update this function to work as an UPDATE method too
 }
@@ -354,6 +420,7 @@ function hideOverlay(ev) {
 
 function showOverlay(ev) {
   ev.preventDefault();
+  saveBtn.className = 'addPerson';
   document.querySelector('.overlay').classList.add('active');
   const id = ev.target.id === 'btnAddPerson' ? 'dlgPerson' : 'dlgIdea';
   document.getElementById(id).classList.add('active');
