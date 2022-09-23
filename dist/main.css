@@ -204,3 +204,37 @@ dialog button {
 :is(dialog, h2) button:active {
   background-color: var(--light-orange);
 }
+
+.edit,
+.delete {
+  margin: 0 2rem;
+  padding: 0.1rem 2rem;
+  border: 1px solid var(--dark-orange);
+  background-color: #fff;
+  color: var(--dark-orange);
+  border-radius: var(--radii);
+  cursor: pointer;
+}
+
+.dlgedit,
+.dlgdelete {
+  border: 1px solid var(--dark-orange);
+  background-color: #fff;
+  color: var(--dark-orange);
+  border-radius: var(--radii);
+  cursor: pointer;
+}
+
+.edit:active,
+.delete:active {
+  background-color: var(--light-orange);
+}
+
+.dlgedit:hover,
+.dlgdelete:hover {
+  background-color: var(--light-orange);
+}
+
+li:hover {
+  background-color: khaki;
+}

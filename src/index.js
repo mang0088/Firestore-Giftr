@@ -257,7 +257,24 @@ async function handleSelectGift(ev) {
         alert(`${docSnap.data().idea} data removed successfully`);
 
         location.reload();
-      } else {
+      }
+      //  else if (ev.target.id === `chk-${id}.checked`) {
+      //   console.log('Bought');
+      //   let bought = document.querySelector('.giftChecked');
+      //   const boughtIdea = {
+      //     idea,
+      //     bought,
+      //     location,
+      //     'person-id': personRef,
+      //   };
+      //   if (bought.checked) {
+      //     bought = 'true';
+      //   } else {
+      //     bought = 'false';
+      //   }
+      //   await updateDoc(doc(db, 'gift-ideas', id), boughtIdea);
+      // }
+      else {
         console.log('Cancel');
       }
     }
@@ -301,8 +318,10 @@ function buildIdeas(ideas) {
       .map((idea) => {
         // console.log(`show ${idea.id}`);
         return `<li class="idea" data-id="${idea.id}">
-                <label for="chk-${idea.id}"
-                  ><input type="checkbox" id="chk-${idea.id}" /> Bought</label
+                <label class="giftChecked" for="chk-${idea.id}"
+                  ><input type="checkbox" id="chk-${idea.id}" ${
+          idea.bought ? 'checked' : ''
+        } /> Bought</label
                 >
                 <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
@@ -375,8 +394,10 @@ async function saveIdea() {
   let idea = document.getElementById('title').value;
   let location = document.getElementById('location').value;
   if (!title || !location) return; //form needs more info
+
   //a new idea needs a reference to the person
   const personRef = doc(db, `/people/${selectedPersonId}`);
+
   const pidea = {
     idea,
     location,
