@@ -9,7 +9,6 @@ import {
   getDocs,
   getDoc,
   addDoc,
-  setDoc,
   deleteDoc,
   updateDoc,
 } from 'firebase/firestore';
@@ -44,8 +43,11 @@ const months = [
   'December',
 ];
 let selectedPersonId = null;
-let saveBtn = document.getElementById('btnSavePerson');
-saveBtn.classList.add('addPerson');
+let selectedGiftId = null;
+let saveBtnPerson = document.getElementById('btnSavePerson');
+saveBtnPerson.classList.add('addPerson');
+let saveBtnIdea = document.getElementById('btnSaveIdea');
+saveBtnIdea.classList.add('editIdea');
 
 document.addEventListener('DOMContentLoaded', () => {
   //set up the dom events
@@ -83,18 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadInitialData() {
   //load the people collection and display
   getPeople();
-  //select the first person on the list
-  //load the gift-ideas collection and display
+
   getIdeas();
 }
 
 async function getPeople() {
-  //call this from DOMContentLoaded init function
-  //the db variable is the one created by the getFirestore(app) call.
   const querySnapshot = await getDocs(collection(db, 'people'));
   querySnapshot.forEach((doc) => {
-    //every `doc` object has a `id` property that holds the `_id` value from Firestore.
-    //every `doc` object has a doc() method that gives you a JS object with all the properties
     const data = doc.data();
     const id = doc.id;
     people.push({ id, ...data });
@@ -163,37 +160,24 @@ async function handleSelectPerson(ev) {
 
   //select the first person from the list of people
   selectedPersonId = buildPeople(people);
-
+  saveBtnPerson.className = 'editPerson';
   if (id) {
     //user clicked inside li
     selectedPersonId = id;
     //did they click the li content OR an edit button OR a delete button?
     if (ev.target.classList.contains('edit')) {
-      saveBtn.className = 'editPerson';
+      saveBtnPerson.className = 'editPerson';
 
       document.querySelector('.overlay').classList.add('active');
       document.getElementById('dlgPerson').classList.add('active');
 
-      if (saveBtn.classList.contains('editPerson')) {
+      if (saveBtnPerson.classList.contains('editPerson')) {
         document.querySelector(`#dlgPerson > h2`).innerHTML = `Edit ${
           docSnap.data().name
         }`;
         document.getElementById('name').value = docSnap.data().name;
         document.getElementById('month').value = docSnap.data()['birth-month'];
         document.getElementById('day').value = docSnap.data()['birth-day'];
-
-        let name = document.getElementById('name').value;
-        let month = document.getElementById('month').value;
-        let day = document.getElementById('day').value;
-
-        console.log(`${name} ${month} ${day}`);
-        const person = {
-          name,
-          'birth-month': month,
-          'birth-day': day,
-        };
-
-        await setDoc(doc(db, 'people', id), person);
       }
     } else if (ev.target.classList.contains('delete')) {
       // deletePerson(id, docSnap.data().name);
@@ -206,9 +190,6 @@ async function handleSelectPerson(ev) {
         await deleteDoc(doc(db, 'people', id));
 
         dlquerySnapshot.forEach((dldoc) => {
-          //every `doc` object has a `id` property that holds the `_id` value from Firestore.
-          //every `doc` object has a doc() method that gives you a JS object with all the properties
-
           let dlid = dldoc.id;
           deleteDoc(doc(db, 'gift-ideas', dlid));
           console.log(`${docSnap.data().name} has id: ${dlid}`);
@@ -249,9 +230,22 @@ async function handleSelectGift(ev) {
   const docRef = doc(collectionRef, id);
   const docSnap = await getDoc(docRef);
 
+  saveBtnIdea.className = 'editIdea';
   if (id) {
     if (ev.target.classList.contains('dlgedit')) {
-      //Edit gifts
+      saveBtnPerson.className = 'editIdea';
+      selectedGiftId = id;
+
+      document.querySelector('.overlay').classList.add('active');
+      document.getElementById('dlgIdea').classList.add('active');
+
+      if (saveBtnPerson.classList.contains('editIdea')) {
+        document.querySelector(`#dlgIdea > h2`).innerHTML = `Edit ${
+          docSnap.data().idea
+        }`;
+        document.getElementById('title').value = docSnap.data().idea;
+        document.getElementById('location').value = docSnap.data().location;
+      }
     } else if (ev.target.classList.contains('dlgdelete')) {
       // deletePerson(id, docSnap.data().name);
       console.log('in gift delete');
@@ -285,19 +279,13 @@ async function getIdeas(id) {
   const querySnapshot = await getDocs(docs);
   const ideas = [];
   querySnapshot.forEach((doc) => {
-    //every `doc` object has a `id` property that holds the `_id` value from Firestore.
-    //every `doc` object has a doc() method that gives you a JS object with all the properties
     const data = doc.data();
     const id = doc.id;
-    // console.log(`idea ${id}`);
-    //person_id is a reference type
-    //we want the actual id string in our object use id to get the _id
-    // console.log(data['person-id']);
+
     ideas.push({
       id,
       idea: data.idea,
       location: data.location,
-      bought: data.bought,
       person_id: data['person-id'].id,
       person_ref: data['person-id'],
     });
@@ -342,8 +330,7 @@ async function savePerson() {
     'birth-month': month,
     'birth-day': day,
   };
-
-  if (saveBtn.classList.contains('addPerson')) {
+  if (saveBtnPerson.classList.contains('addPerson')) {
     try {
       const docRef = await addDoc(collection(db, 'people'), person);
       console.log('Document written with ID: ', docRef.id);
@@ -358,11 +345,26 @@ async function savePerson() {
       person.id = docRef.id;
       //4. ADD the new HTML to the <ul> using the new object
       showPerson(person);
-      saveBtn.classList.remove('addPerson');
+      saveBtnPerson.classList.remove('addPerson');
     } catch (err) {
       console.error('Error adding document: ', err);
       //do you want to stay on the dialog?
       //display a mesage to the user about the problem
+    }
+  }
+  if (saveBtnPerson.classList.contains('editPerson')) {
+    try {
+      await updateDoc(doc(db, 'people', selectedPersonId), person);
+      document.getElementById('name').value = '';
+      document.getElementById('month').value = '';
+      document.getElementById('day').value = '';
+      //2. hide the dialog and the overlay by clicking on overlay
+      document.querySelector('.overlay').click();
+
+      showPerson(person);
+      location.reload();
+    } catch (err) {
+      console.error('Error adding document: ', err);
     }
   }
   //TODO: update this function to work as an UPDATE method too
@@ -395,10 +397,24 @@ async function saveIdea() {
     //4. ADD the new HTML to the <ul> using the new object
     //just recall the method to show all ideas for the selected person
     getIdeas(selectedPersonId);
+    saveBtnIdea.classList.remove('editIdea');
   } catch (err) {
     console.error('Error adding document: ', err);
     //do you want to stay on the dialog?
     //display a mesage to the user about the problem
+  }
+  if (saveBtnIdea.classList.contains('editIdea')) {
+    try {
+      await updateDoc(doc(db, 'gift-ideas', selectedGiftId), pidea);
+      document.getElementById('title').value = '';
+      document.getElementById('location').value = '';
+
+      //2. hide the dialog and the overlay by clicking on overlay
+      document.querySelector('.overlay').click();
+      location.reload();
+    } catch (err) {
+      console.error('Error adding document: ', err);
+    }
   }
   //TODO: update this function to work as an UPDATE method too
 }
@@ -420,7 +436,8 @@ function hideOverlay(ev) {
 
 function showOverlay(ev) {
   ev.preventDefault();
-  saveBtn.className = 'addPerson';
+  saveBtnPerson.className = 'addPerson';
+  saveBtnIdea.className = 'editIdea';
   document.querySelector('.overlay').classList.add('active');
   const id = ev.target.id === 'btnAddPerson' ? 'dlgPerson' : 'dlgIdea';
   document.getElementById(id).classList.add('active');
