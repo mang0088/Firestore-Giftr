@@ -58,9 +58,7 @@ section h2 {
   display: flex;
   justify-content: space-between;
 }
-section h2 > button,
-button.editBtn,
-button.deleteBtn {
+section h2 > button {
   margin-right: 4rem;
   padding: 0.1rem 2rem;
   border: 1px solid var(--dark-orange);
@@ -101,7 +99,6 @@ ul {
   border-radius: var(--radii);
   margin: 1rem 0;
   display: grid;
-  padding-bottom: 0.5rem;
   /*usenamedgridareas*/
   grid-template-areas: 'tab top' 'tab bottom';
   grid-template-columns: 1fr 4fr;
@@ -131,7 +128,7 @@ ul {
   line-height: 2rem;
   padding: 0.5rem;
   color: #222;
-  background-color: var(--very-light-orange);
+  background-color: #fff;
   border-top-right-radius: 0.3rem;
   grid-area: top;
 }
@@ -141,7 +138,7 @@ ul {
   padding: 0.5rem;
   font-weight: 100;
   color: #555;
-  background-color: var(--very-light-orange);
+  background-color: #fff;
   border-bottom-right-radius: 0.3rem;
   grid-area: bottom;
 }
@@ -208,22 +205,36 @@ dialog button {
   background-color: var(--light-orange);
 }
 
-button.editBtn,
-button.deleteBtn {
-  margin-top: 1rem;
-  margin-left: 1rem;
+.edit,
+.delete {
+  margin: 0 2rem;
+  padding: 0.1rem 2rem;
+  border: 1px solid var(--dark-orange);
+  background-color: #fff;
+  color: var(--dark-orange);
+  border-radius: var(--radii);
+  cursor: pointer;
 }
 
-button.deleteBtn {
-  width: 120px;
+.dlgedit,
+.dlgdelete {
+  border: 1px solid var(--dark-orange);
+  background-color: #fff;
+  color: var(--dark-orange);
+  border-radius: var(--radii);
+  cursor: pointer;
 }
 
-button.editBtn:hover {
-  background-color: turquoise;
-  color: white;
+.edit:active,
+.delete:active {
+  background-color: var(--light-orange);
 }
 
-button.deleteBtn:hover {
-  background-color: tomato;
-  color: white;
+.dlgedit:hover,
+.dlgdelete:hover {
+  background-color: var(--light-orange);
+}
+
+li:hover {
+  background-color: khaki;
 }
