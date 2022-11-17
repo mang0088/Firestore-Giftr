@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Firestore-Giftr/static/css/main.a6702d31.css",
+    "main.js": "/Firestore-Giftr/static/js/main.437b38a9.js",
+    "static/js/787.86ef20c0.chunk.js": "/Firestore-Giftr/static/js/787.86ef20c0.chunk.js",
+    "index.html": "/Firestore-Giftr/index.html",
+    "main.a6702d31.css.map": "/Firestore-Giftr/static/css/main.a6702d31.css.map",
+    "main.437b38a9.js.map": "/Firestore-Giftr/static/js/main.437b38a9.js.map",
+    "787.86ef20c0.chunk.js.map": "/Firestore-Giftr/static/js/787.86ef20c0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a6702d31.css",
+    "static/js/main.437b38a9.js"
+  ]
+}
