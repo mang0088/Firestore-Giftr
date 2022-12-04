@@ -238,3 +238,151 @@ dialog button {
 li:hover {
   background-color: khaki;
 }
+
+/* style the container */
+
+/* ---------- FONTAWESOME ---------- */
+/* ---------- https://fortawesome.github.com/Font-Awesome/ ---------- */
+/* ---------- http://weloveiconfonts.com/ ---------- */
+
+@import url(https://weloveiconfonts.com/api/?family=fontawesome);
+
+/* ---------- ERIC MEYER'S RESET CSS ---------- */
+/* ---------- https://meyerweb.com/eric/tools/css/reset/ ---------- */
+
+@import url(https://meyerweb.com/eric/tools/css/reset/reset.css);
+
+/* ---------- FONTAWESOME ---------- */
+
+[class*='fontawesome-']:before {
+  font-family: 'FontAwesome', sans-serif;
+}
+
+/* ---------- GENERAL ---------- */
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+  font-size: 1em;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+strong {
+  font-weight: bold;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+/* ---------- LOGIN ---------- */
+
+#login {
+  margin: 50px auto;
+  width: 300px;
+}
+.signinpart {
+  margin-top: 20px;
+}
+
+.fontawesome-github {
+  font-size: 30px;
+}
+
+.facebook-before {
+  background: #090c12;
+  border-radius: 3px 0px 0px 3px;
+  color: #f4f4f4;
+  display: block;
+  float: left;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  width: 50px;
+}
+
+.facebook {
+  background: #121a26;
+  border: none;
+  border-radius: 0px 3px 3px 0px;
+  color: #f4f4f4;
+  cursor: pointer;
+  height: 50px;
+  text-transform: uppercase;
+  width: 250px;
+}
+
+.twitter-before {
+  background: #189bcb;
+  border-radius: 3px 0px 0px 3px;
+  color: #f4f4f4;
+  display: block;
+  float: left;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  width: 50px;
+}
+
+.twitter {
+  background: #1bb2e9;
+  border: none;
+  border-radius: 0px 3px 3px 0px;
+  color: #f4f4f4;
+  cursor: pointer;
+  height: 50px;
+  text-transform: uppercase;
+  width: 250px;
+}
+
+.icologout {
+  padding-left: 5px;
+  position: relative;
+}
+.mainico {
+  position: absolute;
+  top: -3px;
+}
+.dtable {
+  margin-top: 20px;
+}
+@media only screen and (max-width: 800px) {
+  .facebook {
+    width: 180px;
+  }
+  .twitter {
+    width: 180px;
+  }
+}
+
+@media only screen and (max-width: 670px) {
+  .facebook {
+    width: 100px;
+    font-size: 10px;
+  }
+  .twitter {
+    width: 100px;
+    font-size: 10px;
+  }
+
+  .ideas {
+    display: none;
+  }
+}
+
+/*======================================
+            User & noUser Class
+==========================================*/
+
+.Userclass {
+  display: none;
+}
+
+.NoUserclass {
+  display: none;
+}
