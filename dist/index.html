@@ -5,6 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    />
     <script src="./bundle.js" type="module"></script>
     <link rel="stylesheet" href="./main.css" />
   </head>
@@ -12,36 +16,51 @@
     <header>
       <h1>Fire-Giftr</h1>
       <h2>All Gifts Must Go!</h2>
+
+      <div class="Userclass">
+        <table class="dtable">
+          <tbody>
+            <tr>
+              <td>Wellcome, <b id="usernames"></b></td>
+              <td class="icologout">
+                <i class="fa fa-sign-out" aria-hidden="true" id="logouts"> </i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </header>
     <main>
       <section class="people">
-        <h2>People <button id="btnAddPerson">Add Person</button></h2>
-        <ul class="person-list">
-          <li data-id="asdfasdf" class="person">
-            <p class="name">Sample Name</p>
-            <p class="dob">April 9</p>
-          </li>
-          <li data-id="asdfasdf" class="person selected">
-            <p class="name">Sample Name</p>
-            <p class="dob">April 9</p>
-          </li>
-          <li data-id="asdfasdf" class="person">
-            <p class="name">Sample Name</p>
-            <p class="dob">April 9</p>
-          </li>
-        </ul>
+        <!-----Login user------>
+        <div class="signinpart NoUserclass">
+          <h1><strong>Welcome.</strong> Please login.</h1>
+          <div>
+            <p class="facebook-before"><i class="fa-brands fa-github"></i></p>
+            <button class="facebook" id="GithubSignin">
+              Login Using Gitgub
+            </button>
+          </div>
+          <br />
+          <div>
+            <p class="twitter-before"><i class="fa-brands fa-twitter"></i></p>
+            <button class="twitter" id="TwitterSignin">
+              Login Using Twitter
+            </button>
+          </div>
+        </div>
+
+        <div class="Userclass">
+          <h2>People <button id="btnAddPerson">Add Person</button></h2>
+          <ul id="personListsID" class="person-list"></ul>
+        </div>
       </section>
+
       <section class="ideas">
-        <h2>Ideas <button id="btnAddIdea">Add Idea</button></h2>
-        <ul class="idea-list">
-          <li class="idea" data-id="">
-            <label for="chk-uniqueid"
-              ><input type="checkbox" id="chk-uniqueid" /> Bought</label
-            >
-            <p class="title">Sample Gift Idea</p>
-            <p class="location">url or store name</p>
-          </li>
-        </ul>
+        <div class="Userclass">
+          <h2>Ideas <button id="btnAddIdea">Add Idea</button></h2>
+          <ul id="IdeaListsID" class="idea-list"></ul>
+        </div>
       </section>
     </main>
     <section class="overlay">
