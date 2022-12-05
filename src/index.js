@@ -150,7 +150,7 @@ async function savePerson() {
   };
   if (saveBtnPerson.classList.contains('addPerson')) {
     try {
-      const docRef = await addDoc(collection(db, 'people'), person);
+      const docRef = await addDoc(collection(db, 'People'), person);
       console.log('Document written with ID: ', docRef.id);
       //1. clear the form fields
       document.getElementById('name').value = '';
@@ -220,7 +220,7 @@ const months = [
 ];
 
 async function getPeople() {
-  const querySnapshot = await getDocs(collection(db, 'people'));
+  const querySnapshot = await getDocs(collection(db, 'People'));
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
@@ -275,7 +275,7 @@ peopleList.addEventListener('click', async function (e) {
     showOverlayedit('peopleEdit');
   } else if (e.target.className === 'delete') {
     let pepoleID = e.target.closest('li').id;
-    await deleteDoc(doc(db, 'people', pepoleID));
+    await deleteDoc(doc(db, 'People', pepoleID));
     relodlocation();
   }
 });
