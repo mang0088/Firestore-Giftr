@@ -15,11 +15,12 @@ import {
   doc,
   getDocs,
   getDoc,
+  setDoc,
   addDoc,
   deleteDoc,
   updateDoc,
 } from 'firebase/firestore';
-
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: 'AIzaSyB6djWhodEqw8crZZt85Ig1I2caq2bVBtA',
   authDomain: 'mad9135-hybrid-1-d294b.firebaseapp.com',
@@ -28,7 +29,6 @@ const firebaseConfig = {
   messagingSenderId: '114567409114',
   appId: '1:114567409114:web:8a3f98390259b728e2a4e3',
 };
-//TODO: replace this config object with your own
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -40,7 +40,19 @@ const GithubSignin = document.getElementById('GithubSignin');
 GithubSignin.onclick = function () {
   const provider = new GithubAuthProvider();
   try {
-    signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider).then((result) => {
+      const user = result.user;
+      const usersColRef = collection(db, 'users');
+      setDoc(
+        doc(usersColRef, user.uid),
+        {
+          _id: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+        },
+        { merge: true }
+      );
+    });
   } catch (error) {
     console.log(error);
   }
@@ -51,7 +63,19 @@ const TwitterSignin = document.getElementById('TwitterSignin');
 TwitterSignin.onclick = function () {
   const provider = new TwitterAuthProvider();
   try {
-    signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider).then((result) => {
+      const user = result.user;
+      const usersColRef = collection(db, 'users');
+      setDoc(
+        doc(usersColRef, user.uid),
+        {
+          _id: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+        },
+        { merge: true }
+      );
+    });
   } catch (error) {
     console.log(error);
   }
@@ -64,8 +88,7 @@ onAuthStateChanged(auth, (currentUser) => {
   if (currentUser) {
     getPeople();
     getIdeas();
-    document.getElementById('usernames').innerHTML = currentUser.email;
-    console.log(currentUser);
+    document.getElementById('usernames').innerHTML = currentUser.displayName;
     sessionStorage.setItem('AuthUserID', currentUser.uid);
     ////User element Display
     for (var i = 0; i < Userclass.length; i++) {
@@ -95,7 +118,11 @@ logouts.onclick = function () {
   signOut(auth);
 };
 
+///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 /////////////////////////People List Add///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 let selectedPersonId = null;
 let selectedGiftId = null;
 let saveBtnPerson = document.getElementById('btnSavePerson');
@@ -173,8 +200,9 @@ function showPerson(person) {
   people.push(person);
 }
 
+////////////////////////////////////////////////////////////////////////////
 /////////////////////////People List Show///////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////
 const people = [];
 const months = [
   'January',
@@ -227,8 +255,9 @@ function buildPeople(people) {
   return selected;
 }
 
+////////////////////////////////////////////////////////////////////////////
 /////////////////////////Pepole List Edit///////////////////////////////////
-
+//////////////////////////////////////////////////////////////////////////////
 const peopleList = document.querySelector('#personListsID');
 peopleList.addEventListener('click', async function (e) {
   if (e.target.className === 'edit') {
@@ -251,7 +280,11 @@ peopleList.addEventListener('click', async function (e) {
   }
 });
 
+///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 /////////////////////////Idea List add///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 document.getElementById('btnAddIdea').addEventListener('click', showOverlay);
 document.getElementById('btnCancelIdea').addEventListener('click', hideOverlay);
 document.getElementById('btnSaveIdea').addEventListener('click', saveIdea);
@@ -320,7 +353,7 @@ function buildIdeas(ideas) {
         // console.log(`show ${idea.id}`);
         return `<li class="idea" id="${idea.id}">
               <label class="giftChecked">
-              <input type="checkbox" checked="checked" />
+              <input type="checkbox"  />
                Bought
               </label>
               <p class="title">${idea.idea}</p>
@@ -336,7 +369,9 @@ function buildIdeas(ideas) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////
 /////////////////////////Idea List Edit///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 const idealeList = document.querySelector('#IdeaListsID');
 idealeList.addEventListener('click', async function (e) {
   if (e.target.className === 'dlgedit') {
